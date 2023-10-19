@@ -14,8 +14,8 @@ public class TestProjectsJSON {
 
     // 2.1 Successful GET request on projects
     @Test
-    public void SuccessfulGETProjects() throws Exception {
-        String urlLink = "http://localhost:4567/gui/instances?entity=project";
+    public void ValidLinkGetProjects() throws Exception {
+        String urlLink = "http://localhost:4567/projects";
 
         // Create a URL object
         URL url = new URL(urlLink);
@@ -32,9 +32,34 @@ public class TestProjectsJSON {
         assertEquals(HttpURLConnection.HTTP_OK, responseCode);
     }
 
-    // 2.2 Test GET with invalid URL
+    //2.2 Test the HEAD request with valid link
     @Test
-    public void UnsuccessfulGETProjects() throws Exception {
+    public void ValidLinkHeadProjects() throws Exception {
+        String urlLink = "http://localhost:4567/projects";
+
+        // Create a URL object
+        URL url = new URL(urlLink);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("HEAD");
+
+        // Get the response code
+        int responseCode = connection.getResponseCode();
+        System.out.println("Response Code:"+ responseCode);
+
+        System.out.println("Response Headers:");
+        connection.getHeaderFields().forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
+        connection.disconnect();
+
+        // Assert that the response code is 200
+        assertEquals(HttpURLConnection.HTTP_OK, responseCode);
+    }
+
+    // 2.3 Test GET with invalid URL
+    @Test
+    public void InvalidLinkGetProjects() throws Exception {
         //Non-existent URL
         String urlLink = "http://localhost:4567/nonexistentlink";
 
@@ -55,9 +80,9 @@ public class TestProjectsJSON {
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, responseCode);
     }
 
-    // 2.3 Test POST request with valid inputs
+    // 2.4 Test POST request with valid inputs
     @Test
-    public void SuccessfulPOSTProjects() throws Exception {
+    public void ValidValuesPostProjects() throws Exception {
 
         URL url = new URL("http://localhost:4567/projects");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -107,9 +132,9 @@ public class TestProjectsJSON {
         connectionDelete.disconnect();
     }
 
-    // 2.4 Test with invalid value for completed, should return code 400
+    // 2.5 Test with invalid value for completed, should return code 400
     @Test
-    public void UnsuccessfulPOSTProjects() throws Exception {
+    public void InvalidCompletedValuePostProjects() throws Exception {
 
         URL url = new URL("http://localhost:4567/projects");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -140,9 +165,76 @@ public class TestProjectsJSON {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, responseCode);
     }
 
-    // 2.5 Test Successful DELETE Request
+    //2.6 Invalid Active value, should return BAD REQUEST
     @Test
-    public void SuccessfulDeleteRequest() throws Exception {
+    public void InvalidActiveValuePostProjects() throws Exception {
+
+        URL url = new URL("http://localhost:4567/projects");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        // Set the request method to POST
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+
+        // Set the content type to JSON for these tests
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        // Invalid value for completed (should be boolean, but is INT)
+        String projectData = "{ \"title\": \"New Project\", \"completed\": true, \"active\": no, \"description\": \"A new project\" }";
+
+        // Write the data to the request body
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = projectData.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        // Get the response code
+        int responseCode = connection.getResponseCode();
+        System.out.println("Response Code:"+ responseCode);
+
+        connection.disconnect();
+
+        // Assert that the response code is 400, BAD REQUEST
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, responseCode);
+    }
+
+    //2.7 Malformed payload, added non-existent node, should return BAD REQUEST
+    @Test
+    public void MalformedPayloadPostProjectsJSON() throws Exception {
+
+        URL url = new URL("http://localhost:4567/projects");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        // Set the request method to POST
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+
+        // Set the content type to JSON for these tests
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        // Invalid value for completed (should be boolean, but is INT)
+        String projectData = "{ \"title\": \"New Project\", \"completed\": true, \"active\": false, \"description\": \"A new project\" " +
+                ", \"notes\": \"Non-existing field\"}";
+
+        // Write the data to the request body
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = projectData.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        // Get the response code
+        int responseCode = connection.getResponseCode();
+        System.out.println("Response Code:"+ responseCode);
+
+        connection.disconnect();
+
+        // Assert that the response code is 400, BAD REQUEST
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, responseCode);
+    }
+
+    // 2.8 Test Successful DELETE Request
+    @Test
+    public void ValidDeleteRequest() throws Exception {
 
         //Arrange new Project for test
         URL url = new URL("http://localhost:4567/projects");
@@ -197,7 +289,7 @@ public class TestProjectsJSON {
         assertEquals(HttpURLConnection.HTTP_OK, responseCodeDelete);
     }
 
-    // 2.6 Test invalid DELETE Request
+    // 2.9 Test invalid DELETE Request
     @Test
     public void NonExistentIdDeleteRequest() throws Exception {
 
@@ -218,7 +310,7 @@ public class TestProjectsJSON {
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, responseCodeDelete);
     }
 
-    // 2.7 Successful PUT request
+    // 2.10 Successful PUT request
     @Test
     public void ValidPutRequest() throws Exception {
 
@@ -271,7 +363,7 @@ public class TestProjectsJSON {
         String updatedProjectData = "{ \"title\": \"New Name Project\"}";
 
         // Write the updated data to the request body
-        try (OutputStream os = putConnection.getOutputStream()) {
+       try (OutputStream os = putConnection.getOutputStream()) {
             byte[] input = updatedProjectData.getBytes("utf-8");
             os.write(input, 0, input.length);
         }
@@ -293,9 +385,9 @@ public class TestProjectsJSON {
     }
 
 
-    // 2.8 Unsuccesful PUT request
+    // 2.11 Unsuccesful PUT request
     @Test
-    public void InvalidPutRequest() throws Exception {
+    public void InvalidValuePutRequest() throws Exception {
 
         // Arrange new Project for test
         URL url = new URL("http://localhost:4567/projects");

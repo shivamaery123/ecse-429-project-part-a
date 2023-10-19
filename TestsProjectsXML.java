@@ -12,9 +12,9 @@ import org.junit.jupiter.api.TestMethodOrder;
 @TestMethodOrder(MethodOrderer.Random.class)
 public class TestsProjectsXML {
 
-    // 2.9 Test GET request on projects with invalid xml payload
+    // 2.12 Test GET request on projects with invalid xml payload
     @Test
-    public void SuccessfulGETProjectsXML() throws Exception {
+    public void SuccessfulGetProjectsXML() throws Exception {
         String urlLink = "http://localhost:4567/gui/instances?entity=project";
 
         // Create a URL object
@@ -34,9 +34,36 @@ public class TestsProjectsXML {
         assertEquals(HttpURLConnection.HTTP_OK, responseCode);
     }
 
-    // 2.10 Test POST request with valid inputs
+    //2.13 Test Head with XML format
     @Test
-    public void SuccessfulPOSTProjectsXML() throws Exception {
+    public void ValidLinkHeadProjectsXML() throws Exception {
+        String urlLink = "http://localhost:4567/projects";
+
+        // Create a URL object
+        URL url = new URL(urlLink);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestProperty("Content-Type", "application/xml");
+        connection.setRequestProperty("Accept", "application/xml");
+        connection.setRequestMethod("HEAD");
+
+        // Get the response code
+        int responseCode = connection.getResponseCode();
+        System.out.println("Response Code:"+ responseCode);
+
+        System.out.println("Response Headers:");
+        connection.getHeaderFields().forEach((key, value) -> {
+            System.out.println(key + ": " + value);
+        });
+
+        connection.disconnect();
+
+        // Assert that the response code is 200
+        assertEquals(HttpURLConnection.HTTP_OK, responseCode);
+    }
+
+    // 2.14 Test POST request with valid inputs
+    @Test
+    public void SuccessfulPostProjectsXML() throws Exception {
 
         URL url = new URL("http://localhost:4567/projects");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -92,9 +119,9 @@ public class TestsProjectsXML {
         connectionDelete.disconnect();
     }
 
-    // 2.11 Test with invalid value for completed, should return code 400
+    // 2.15 Test with invalid value for completed, should return code 400
     @Test
-    public void UnsuccessfulPOSTProjectsXML() throws Exception {
+    public void InvalidCompletedValuePostProjectsXML() throws Exception {
 
         URL url = new URL("http://localhost:4567/projects");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -131,7 +158,86 @@ public class TestsProjectsXML {
         assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, responseCode);
     }
 
-    // 2.12 Test Successful DELETE Request
+    // 2.16 Tests POST with an invalid value for active
+    @Test
+    public void InvalidActiveValuePostProjectsXML() throws Exception {
+
+        URL url = new URL("http://localhost:4567/projects");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        // Set the request method to POST
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+
+        // Set the content type to JSON for these tests
+        connection.setRequestProperty("Content-Type", "application/xml");
+        connection.setRequestProperty("Accept", "application/xml");
+
+        // Invalid value for completed (should be boolean, but is INT)
+        String projectData = "<project>\n" +
+                "    <title>New Project</title>\n" +
+                "    <completed>true</completed>\n" +
+                "    <active>456</active>\n" +
+                "    <description>A new project</description>\n" +
+                "</project>";
+
+        // Write the data to the request body
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = projectData.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        // Get the response code
+        int responseCode = connection.getResponseCode();
+        System.out.println("Response Code:"+ responseCode);
+
+        connection.disconnect();
+
+        // Assert that the response code is 400, BAD REQUEST
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, responseCode);
+    }
+
+    //2.17 Malformed payload, added non-existent node, should return BAD REQUEST
+    @Test
+    public void MalformedPayloadPostProjectsXML() throws Exception {
+
+        URL url = new URL("http://localhost:4567/projects");
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        // Set the request method to POST
+        connection.setRequestMethod("POST");
+        connection.setDoOutput(true);
+
+        // Set the content type to JSON for these tests
+        connection.setRequestProperty("Content-Type", "application/xml");
+        connection.setRequestProperty("Accept", "application/xml");
+
+        // Invalid value for completed (should be boolean, but is INT)
+        String projectData = "<project>\n" +
+                "    <title>New Project</title>\n" +
+                "    <completed>false</completed>\n" +
+                "    <active>true</active>\n" +
+                "    <description>A new project</description>\n" +
+                "    <notes>Non-existing node</notes>\n" +
+                "</project>";
+
+        // Write the data to the request body
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = projectData.getBytes("utf-8");
+            os.write(input, 0, input.length);
+        }
+
+        // Get the response code
+        int responseCode = connection.getResponseCode();
+        System.out.println("Response Code:"+ responseCode);
+
+        connection.disconnect();
+
+        // Assert that the response code is 400, BAD REQUEST
+        assertEquals(HttpURLConnection.HTTP_BAD_REQUEST, responseCode);
+    }
+
+    // 2.18 Test Successful DELETE Request
     @Test
     public void SuccessfulDeleteRequestXML() throws Exception {
 
@@ -192,7 +298,7 @@ public class TestsProjectsXML {
         assertEquals(HttpURLConnection.HTTP_OK, responseCodeDelete);
     }
 
-    // 2.13 Test unsuccessful DELETE Request
+    // 2.19 Test unsuccessful DELETE Request
     @Test
     public void UnuccessfulDeleteRequestXML() throws Exception {
 
@@ -213,7 +319,7 @@ public class TestsProjectsXML {
         assertEquals(HttpURLConnection.HTTP_NOT_FOUND, responseCodeDelete);
     }
 
-    // 2.14 Successful PUT request
+    // 2.20 Successful PUT request
     @Test
     public void ValidPutRequestXML() throws Exception {
 
@@ -299,7 +405,7 @@ public class TestsProjectsXML {
     }
 
 
-    // 2.15 Unsuccesful PUT request
+    // 2.21 Unsuccesful PUT request
     @Test
     public void InvalidPutRequestXML() throws Exception {
 
