@@ -5,22 +5,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
-
 import org.json.JSONObject;
 import org.junit.jupiter.api.*;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 @TestMethodOrder(MethodOrderer.Random.class)
 public class TestCategoriesXml {
-  public Process applicationProcess;
-  public boolean processStarted = false;
-
 
   @BeforeEach
   public void start_app() throws InterruptedException {
@@ -36,10 +25,7 @@ public class TestCategoriesXml {
       fail();
       e.printStackTrace();
     }
-    //        catch (InterruptedException | IOException e) {
-    //            e.printStackTrace();
-    //
-    //        }
+
     Thread.sleep(500);
   }
 
@@ -443,28 +429,29 @@ public class TestCategoriesXml {
       fail();
     }
   }
+
   @Test
   public void create_categories_with_only_title_and_description_malformed() {
     try {
       String category =
-              "title>newest category</title><description>random description</description>";
+          "title>newest category</title><description>random description</description>";
 
       HttpRequest.BodyPublisher modified_category_to_send =
-              HttpRequest.BodyPublishers.ofString(category);
+          HttpRequest.BodyPublishers.ofString(category);
       HttpRequest request =
-              HttpRequest.newBuilder()
-                      .uri(new URI("http://localhost:4567/categories"))
-                      .header("Accept", "application/xml")
-                      .POST(modified_category_to_send)
-                      .header("Content-Type", "application/xml")
-                      .build();
+          HttpRequest.newBuilder()
+              .uri(new URI("http://localhost:4567/categories"))
+              .header("Accept", "application/xml")
+              .POST(modified_category_to_send)
+              .header("Content-Type", "application/xml")
+              .build();
       HttpClient client = HttpClient.newHttpClient();
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       int responseCode = response.statusCode();
       String responseBody = response.body();
       assertEquals(400, responseCode);
       String expected_response =
-              "<errorMessages><errorMessage>Mismatched close tag title at 28 [character 29 line 1]</errorMessage></errorMessages>";
+          "<errorMessages><errorMessage>Mismatched close tag title at 28 [character 29 line 1]</errorMessage></errorMessages>";
       assertEquals(expected_response, responseBody);
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());

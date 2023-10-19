@@ -21,15 +21,14 @@ public class TestCategories {
     try {
       new JSONObject(response_json);
 
-    }
-
-    catch (JSONException e) {
+    } catch (JSONException e) {
       e.printStackTrace();
       return false;
     }
 
     return true;
   }
+
   @BeforeEach
   public void start_app() throws InterruptedException {
     try {
@@ -44,10 +43,7 @@ public class TestCategories {
       fail();
       e.printStackTrace();
     }
-    //        catch (InterruptedException | IOException e) {
-    //            e.printStackTrace();
-    //
-    //        }
+
     Thread.sleep(500);
   }
 
@@ -76,10 +72,6 @@ public class TestCategories {
       fail();
       e.printStackTrace();
     }
-    //        catch (IOException | InterruptedException e) {
-    //            e.printStackTrace();
-    //        }
-
   }
 
   @Test
@@ -115,7 +107,6 @@ public class TestCategories {
           (Category1, Category2) ->
               Integer.compare(Category1.getInt("id"), Category2.getInt("id")));
       JSONArray actual_response = new JSONArray(jsonList);
-
 
       assertEquals(expected_response.get(0).toString(), actual_response.get(0).toString());
       assertEquals(expected_response.get(1).toString(), actual_response.get(1).toString());
@@ -214,8 +205,7 @@ public class TestCategories {
       expected_response_body.put("description", "new description");
       expected_response_body.put("title", "new title");
       JSONObject actual_response_body = new JSONObject(responseBody);
-      assertEquals(
-          expected_response_body.toString(), actual_response_body.toString());
+      assertEquals(expected_response_body.toString(), actual_response_body.toString());
 
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
@@ -253,8 +243,7 @@ public class TestCategories {
       error_message.put("Invalid GUID for 3 entity category");
       expected_response_body.put("errorMessages", error_message);
       JSONObject actual_response_body = new JSONObject(responseBody);
-      assertEquals(
-          expected_response_body.toString(), actual_response_body.toString());
+      assertEquals(expected_response_body.toString(), actual_response_body.toString());
 
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
@@ -293,8 +282,7 @@ public class TestCategories {
       error_message.put("No such category entity instance with GUID or ID 3 found");
       expected_response_body.put("errorMessages", error_message);
       JSONObject actual_response_body = new JSONObject(responseBody);
-      assertEquals(
-          expected_response_body.toString(), actual_response_body.toString());
+      assertEquals(expected_response_body.toString(), actual_response_body.toString());
 
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
@@ -332,8 +320,7 @@ public class TestCategories {
       expected_response_body.put("title", "newly created category");
       expected_response_body.put("description", "newly created category description");
       JSONObject actual_response_body = new JSONObject(responseBody);
-      assertEquals(
-          expected_response_body.toString(), actual_response_body.toString());
+      assertEquals(expected_response_body.toString(), actual_response_body.toString());
 
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
@@ -368,8 +355,7 @@ public class TestCategories {
       error_message.put("title : field is mandatory");
       expected_response_body.put("errorMessages", error_message);
       JSONObject actual_response_body = new JSONObject(responseBody);
-      assertEquals(
-          expected_response_body.toString(), actual_response_body.toString());
+      assertEquals(expected_response_body.toString(), actual_response_body.toString());
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
       fail();
@@ -405,8 +391,7 @@ public class TestCategories {
       expected_response_body.put("title", "newest category");
       expected_response_body.put("description", "");
       JSONObject actual_response_body = new JSONObject(responseBody);
-      assertEquals(
-          expected_response_body.toString(), actual_response_body.toString());
+      assertEquals(expected_response_body.toString(), actual_response_body.toString());
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
       fail();
@@ -444,8 +429,7 @@ public class TestCategories {
       error_message.put("Invalid Creation: Failed Validation: Not allowed to create with id");
       expected_response_body.put("errorMessages", error_message);
       JSONObject actual_response_body = new JSONObject(responseBody);
-      assertEquals(
-          expected_response_body.toString(), actual_response_body.toString());
+      assertEquals(expected_response_body.toString(), actual_response_body.toString());
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
       fail();
@@ -482,8 +466,7 @@ public class TestCategories {
       expected_response_body.put("title", "newest category");
       expected_response_body.put("description", "random description");
       JSONObject actual_response_body = new JSONObject(responseBody);
-      assertEquals(
-          expected_response_body.toString(), actual_response_body.toString());
+      assertEquals(expected_response_body.toString(), actual_response_body.toString());
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
       fail();
@@ -503,23 +486,23 @@ public class TestCategories {
       category.put("title", "newest category");
       category.put("description", "random description");
       HttpRequest.BodyPublisher modified_category_to_send =
-              HttpRequest.BodyPublishers.ofString(category.toString().substring(1));
+          HttpRequest.BodyPublishers.ofString(category.toString().substring(1));
       HttpRequest request =
-              HttpRequest.newBuilder()
-                      .uri(new URI("http://localhost:4567/categories"))
-                      .POST(modified_category_to_send)
-                      .build();
+          HttpRequest.newBuilder()
+              .uri(new URI("http://localhost:4567/categories"))
+              .POST(modified_category_to_send)
+              .build();
       HttpClient client = HttpClient.newHttpClient();
       HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
       int responseCode = response.statusCode();
       String responseBody = response.body();
-      String error = "java.lang.IllegalStateException: Expected BEGIN_OBJECT but was STRING at line 1 column 2 path $";
+      String error =
+          "java.lang.IllegalStateException: Expected BEGIN_OBJECT but was STRING at line 1 column 2 path $";
       JSONObject expected_response_body = new JSONObject();
       JSONArray error_message = new JSONArray();
       error_message.put(error);
       expected_response_body.put("errorMessages", error_message);
-      assertEquals(
-              expected_response_body.toString(), responseBody);
+      assertEquals(expected_response_body.toString(), responseBody);
     } catch (java.net.URISyntaxException e) {
       System.out.println("Caught URI Syntax Exception: " + e.getMessage());
       fail();
@@ -531,5 +514,4 @@ public class TestCategories {
       fail();
     }
   }
-
 }
